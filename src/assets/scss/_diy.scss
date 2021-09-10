@@ -1,0 +1,58 @@
+@import "./variables";
+
+/* 表格相关样式
+------------------------------ */
+.table-img {
+  img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.table-avatar {
+  border-radius: 50%;
+  img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* 表单相关样式
+------------------------------ */
+.form-img {
+  img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* 其他自定义样式
+------------------------------ */
+#tip-alert {
+  height: 30px;
+  line-height: 30px;
+  padding: 8px 8px;
+  font-size: 12px;
+}
+
+/** 自定义了一个模拟 el-button样式的按钮 */
+.mini-button {
+  border: 1px solid #dcdfe6;
+  padding: 8px 20px;
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 12px;
+  outline: 0;
+  margin: 0;
+  box-sizing: border-box;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.mini-button:hover {
+  border-color: rgba($--color-primary, .3);
+  background-color: rgba($--color-primary, .1);
+  color: $--color-primary;
+}

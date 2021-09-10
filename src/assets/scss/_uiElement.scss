@@ -1,0 +1,32 @@
+/* 修改 el-table的默认行高
+------------------------------ */
+.el-table__header th {
+  background-color: #fafafa;
+}
+
+.el-table th {
+  padding: 10px 0;
+}
+
+.el-table td {
+  padding: 6px 0;
+}
+
+/* 修改 el-table的默认行高
+------------------------------ */
+.el-table__fixed-right {
+  height: 100% !important;
+}
+
+/* 修改 el-rate的默认宽度
+------------------------------ */
+.el-rate {
+  width: 120px;
+  margin: 0 auto;
+}
+.el-rate__item {
+  width: 12%;
+}
+.el-rate__text {
+  padding-left: 15px;
+}
