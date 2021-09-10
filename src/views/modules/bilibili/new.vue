@@ -1,28 +1,39 @@
 <template>
   <div>
-    <div>
-      <div
-        :style="{
-          width: width + 'vw',
-          margin: '0 auto',
-          textAlign: 'left',
-          padding: '10px',
-          fontSize: '16px'
-        }"
-      >
-        <div v-if="!isModify">
-          直播间：<span>{{ roomId }}</span>
-          <el-button @click="isModify = true">修改</el-button>
-        </div>
-        <el-row :gutter="20" v-else>
-          <el-col :span="12" :offset="0">
-            <el-input v-model="roomId" placeholder="输入房间号"></el-input>
-          </el-col>
-          <el-col :span="12" :offset="0">
-            <el-button @click="modifyRoomIdHandle(roomId)">确定</el-button>
-          </el-col>
-        </el-row>
-      </div>
+    <div
+      :style="{
+        width: width + 'vw',
+        margin: '0 auto',
+        textAlign: 'left',
+        padding: '10px',
+        fontSize: '16px'
+      }"
+    >
+      <el-row>
+        <el-col :span="20" :offset="0">
+          <div v-if="!isModify">
+            直播间：<span>{{ roomId }}</span>
+            <el-button size="mini" @click="isModify = true">修改</el-button>
+          </div>
+          <div v-else>
+            <el-input
+              size="mini"
+              style="max-width:150px"
+              v-model="roomId"
+              clearable
+              placeholder="输入房间号"
+            ></el-input>
+            <el-button size="mini" @click="modifyRoomIdHandle(roomId)"
+              >确定</el-button
+            >
+          </div>
+        </el-col>
+        <el-col :span="4" :offset="0">
+          <el-button size="mini" @click="modifyRoomIdHandle(roomId)"
+            >确定</el-button
+          >
+        </el-col>
+      </el-row>
     </div>
     <div class="bili-bg" :style="{ width: width + 'vw' }">
       <div
@@ -64,9 +75,12 @@
             >
               {{ item.user }}
             </span>
-            <span style="width: 40%; margin-right: 15px; text-align: left">{{
-              item.name
-            }}</span>
+            <span
+              class="animate"
+              style="width: 40%; margin-right: 15px; text-align: left"
+            >
+              {{ item.name }}
+            </span>
             <div style="width: 30%; text-align: left">
               {{ timeFun(item.time, true) }}
               <div class="del-btn" @click="delHandle(item, index)">
@@ -126,7 +140,6 @@ export default {
     let tempId = localStorage.getItem("roomId");
     if (!this.isEmpty(tempId)) {
       this.roomId = parseInt(tempId);
-      debugger
       this.openConnection();
     }
     this.getRoomLiveInfo();
@@ -166,15 +179,18 @@ export default {
         });
     },
     modifyRoomIdHandle(e) {
-      let _this = this;
-      let idNum = parseInt(e);
-      this.roomId = idNum;
-      this.isModify = false;
-      localStorage.setItem("roomId", e);
-      _this.socketTask.close();
-      debugger
-      _this.openConnection();
-      _this.getRoomLiveInfo;
+      if (!this.isEmpty(e)) {
+        let _this = this;
+        let idNum = parseInt(e);
+        this.roomId = idNum;
+        this.isModify = false;
+        localStorage.setItem("roomId", e);
+        _this.socketTask.close();
+        _this.openConnection();
+        _this.getRoomLiveInfo;
+      } else {
+        this.roomId = 0;
+      }
     },
     /** 打开连接 */
     openConnection() {
@@ -445,5 +461,35 @@ export default {
   // top: 10px;
   cursor: pointer;
   color: rgb(238, 10, 36);
+}
+.animate {
+  padding-left: 20px;
+  font-size: 12px;
+  color: #000;
+  display: inline-block;
+  white-space: nowrap;
+  animation: 10s wordsLoop linear infinite normal;
+}
+
+@keyframes wordsLoop {
+  0% {
+    transform: translateX(200px);
+    -webkit-transform: translateX(200px);
+  }
+  100% {
+    transform: translateX(-100%);
+    -webkit-transform: translateX(-100%);
+  }
+}
+
+@-webkit-keyframes wordsLoop {
+  0% {
+    transform: translateX(200px);
+    -webkit-transform: translateX(200px);
+  }
+  100% {
+    transform: translateX(-100%);
+    -webkit-transform: translateX(-100%);
+  }
 }
 </style>
