@@ -79,7 +79,8 @@ import {
   Message,
   Notification,
   Timeline,
-  TimelineItem
+  TimelineItem,
+  Drawer
 } from 'element-ui'
 
 Dialog.props.lockScroll.default = false;
@@ -151,6 +152,7 @@ Vue.use(Main)
 Vue.use(Footer)
 Vue.use(Timeline)
 Vue.use(TimelineItem)
+Vue.use(Drawer)
 
 Vue.use(Loading.directive)
 
@@ -159,7 +161,7 @@ Vue.prototype.$msgbox = MessageBox
 Vue.prototype.$alert = MessageBox.alert
 Vue.prototype.$confirm = MessageBox.confirm
 Vue.prototype.$prompt = MessageBox.prompt
-Vue.prototype.$notify = Notification
+Vue.prototype.$enotify = Notification
 Vue.prototype.$message = Message
 
 Vue.prototype.$ELEMENT = { size: 'medium' }

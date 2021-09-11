@@ -29,8 +29,8 @@
           </div>
         </el-col>
         <el-col :span="4" :offset="0">
-          <el-button size="mini" @click="modifyRoomIdHandle(roomId)"
-            >确定</el-button
+          <el-button size="mini" @click="roomConfigHandle(roomId)"
+            >设置</el-button
           >
         </el-col>
       </el-row>
@@ -48,13 +48,17 @@
         "
       >
         <span
-          style="width: 30%; margin-right: 15px; opacity: 0.5; text-align: left"
+          style="width: 5%; margin-right: 15px; opacity: 0.5; text-align: left;font-size:14px"
+          ></span
+        >
+        <span
+          style="width: 28%; margin-right: 15px; opacity: 0.5; text-align: left"
           >用户</span
         >
-        <span style="width: 40%; margin-right: 15px; text-align: left"
+        <span style="width: 38%; margin-right: 15px; text-align: left"
           >歌名</span
         >
-        <span style="width: 30%; text-align: left">点歌时间</span>
+        <span style="width: 28%; text-align: left">点歌时间</span>
       </div>
       <div style="padding-top: 40px">
         <van-swipe-cell
@@ -66,24 +70,34 @@
           <div class="van-cell" :style="{ width: width + 'vw' }">
             <span
               style="
-                width: 30%;
+                width: 5%;
+                margin-right: 15px;
+                text-align: left;
+              "
+            >
+              {{ index + 1 }}
+            </span>
+            <span
+              style="
+                width: 28%;
                 margin-right: 15px;
                 opacity: 0.5;
                 text-align: left;
                 word-break: break-all;
+                font-size:14px
               "
             >
-              {{ item.user }}
+              {{ item.username }}
             </span>
             <span
               class="animate"
-              style="width: 40%; margin-right: 15px; text-align: left"
+              style="width: 38%; margin-right: 15px; text-align: left;font-size:14px"
             >
-              {{ item.name }}
+              {{ item.songTitle }}
             </span>
-            <div style="width: 30%; text-align: left">
-              {{ timeFun(item.time, true) }}
-              <div class="del-btn" @click="delHandle(item, index)">
+            <div style="width: 28%; text-align: left;font-size:14px">
+              {{ timeFun(item.chooseTime, true) }}
+              <div class="del-btn" @click="delHandle(item.id)">
                 删除
               </div>
             </div>
@@ -91,9 +105,11 @@
         </van-swipe-cell>
       </div>
     </div>
+    <room-config v-if="isRoomConfigVisible" ref="roomConfig"></room-config>
   </div>
 </template>
 <script>
+import RoomConfig from "./room-config.vue";
 import pako from "pako";
 import axios from "axios";
 const instance = axios.create({
@@ -115,8 +131,10 @@ const instance = axios.create({
   }
 });
 export default {
+  components: { RoomConfig },
   data() {
     return {
+      isRoomConfigVisible: false,
       socketTask: null,
       lockReconnect: false,
       liveTime: "", // 开播时间
@@ -140,6 +158,7 @@ export default {
     let tempId = localStorage.getItem("roomId");
     if (!this.isEmpty(tempId)) {
       this.roomId = parseInt(tempId);
+      this.getSongBoardList();
       this.openConnection();
     }
     this.getRoomLiveInfo();
@@ -160,6 +179,14 @@ export default {
     }
   },
   methods: {
+    roomConfigHandle(roomId) {
+      let _this = this;
+      this.isRoomConfigVisible = true;
+      this.$nextTick(() => {
+        _this.$refs.roomConfig.init(roomId);
+      });
+    },
+    /** 通过B站接口获取直播间信息 */
     getRoomLiveInfo() {
       let _this = this;
       this.$http({
@@ -187,7 +214,8 @@ export default {
         localStorage.setItem("roomId", e);
         _this.socketTask.close();
         _this.openConnection();
-        _this.getRoomLiveInfo;
+        _this.getRoomLiveInfo();
+        _this.getSongBoardList();
       } else {
         this.roomId = 0;
       }
@@ -291,13 +319,14 @@ export default {
                       let obj = {};
                       let id = cont_.indexOf(arr[1]);
                       obj.uid = item.info[2][0];
-                      obj.user = item.info[2][1];
-                      obj.name = contArr_
+                      obj.username = item.info[2][1];
+                      obj.songTitle = contArr_
                         .splice(id + 1)
                         .join("")
                         .replace(" ", "");
-                      obj.time = item.info[0][4];
+                      obj.chooseTime = item.info[0][4];
                       obj.roomId = _this.roomId;
+                      _this.createSongBoradItem(obj);
                       return;
                     }
                   }
@@ -337,6 +366,113 @@ export default {
         _this.createWebSocket();
         _this.lockReconnect = false;
       }, 5000);
+    },
+    /** 获取点歌信息 */
+    getSongBoardList() {
+      let _this = this;
+      let startTime = this.liveTime;
+      this.$http({
+        url: this.$http.adornUrl("/room/song/select"),
+        method: "post",
+        data: this.$http.adornData({
+          roomId: _this.roomId,
+          chooseTime: startTime,
+          deleted: 1
+        })
+      })
+        .then(({ data }) => {
+          if (data && data.code == 0) {
+            this.songArr = data.data;
+          } else {
+            if (_this.isMobile) {
+              _this.$notify({
+                type: "danger",
+                msg: data.msg
+              });
+            } else {
+              _this.$message({
+                type: "error",
+                msg: data.msg
+              });
+            }
+          }
+        })
+        .catch(err => {});
+    },
+    /** 删除某条点歌信息 */
+    delHandle(id) {
+      let _this = this;
+      this.$http({
+        url: this.$http.adornUrl("/room/song/delete"),
+        method: "post",
+        data: this.$http.adornData({
+          id: id
+        })
+      })
+        .then(({ data }) => {
+          if (data && data.code == 0) {
+            _this.getSongBoardList();
+          } else {
+            if (_this.isMobile) {
+              _this.$notify({
+                type: "danger",
+                msg: data.msg
+              });
+            } else {
+              _this.$message({
+                type: "error",
+                msg: data.msg
+              });
+            }
+          }
+        })
+        .catch(err => {});
+    },
+    /** 添加点歌信息 */
+    createSongBoradItem(obj) {
+      let _this = this;
+      this.$http({
+        url: this.$http.adornUrl("/room/song/create"),
+        method: "post",
+        data: this.$http.adornData({
+          roomId: _this.roomId,
+          uid: obj.uid,
+          songTitle: obj.songTitle,
+          username: obj.username,
+          chooseTime: obj.chooseTime
+        })
+      })
+        .then(({ data }) => {
+          if (data && data.code == 0) {
+            _this.getSongBoardList();
+            if (_this.isMobile) {
+              _this.$notify({
+                type: "success",
+                message: `${obj.username}点歌成功`,
+                duration: 1000
+              });
+            } else {
+              _this.$message({
+                type: "success",
+                message: `${obj.username}点歌成功`,
+                duration: 1000
+              });
+            }
+          } else {
+            if (_this.isMobile) {
+              _this.$notify({
+                type: "danger",
+                message: data.msg
+              });
+            } else {
+              _this.$message({
+                type: "error",
+                message: data.msg
+              });
+            }
+          }
+        })
+        .catch(err => {});
     },
 
     //组合认证数据包
@@ -451,7 +587,7 @@ export default {
 }
 .van-cell {
   background: transparent;
-  font-size: 18px;
+  font-size: 16px;
   color: #000;
   position: relative;
 }
@@ -462,34 +598,34 @@ export default {
   cursor: pointer;
   color: rgb(238, 10, 36);
 }
-.animate {
-  padding-left: 20px;
-  font-size: 12px;
-  color: #000;
-  display: inline-block;
-  white-space: nowrap;
-  animation: 10s wordsLoop linear infinite normal;
-}
+// .animate {
+//   padding-left: 20px;
+//   font-size: 12px;
+//   color: #000;
+//   display: inline-block;
+//   white-space: nowrap;
+//   animation: 10s wordsLoop linear infinite normal;
+// }
 
-@keyframes wordsLoop {
-  0% {
-    transform: translateX(200px);
-    -webkit-transform: translateX(200px);
-  }
-  100% {
-    transform: translateX(-100%);
-    -webkit-transform: translateX(-100%);
-  }
-}
+// @keyframes wordsLoop {
+//   0% {
+//     transform: translateX(200px);
+//     -webkit-transform: translateX(200px);
+//   }
+//   100% {
+//     transform: translateX(-100%);
+//     -webkit-transform: translateX(-100%);
+//   }
+// }
 
-@-webkit-keyframes wordsLoop {
-  0% {
-    transform: translateX(200px);
-    -webkit-transform: translateX(200px);
-  }
-  100% {
-    transform: translateX(-100%);
-    -webkit-transform: translateX(-100%);
-  }
-}
+// @-webkit-keyframes wordsLoop {
+//   0% {
+//     transform: translateX(200px);
+//     -webkit-transform: translateX(200px);
+//   }
+//   100% {
+//     transform: translateX(-100%);
+//     -webkit-transform: translateX(-100%);
+//   }
+// }
 </style>
