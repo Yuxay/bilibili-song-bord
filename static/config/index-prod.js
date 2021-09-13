@@ -6,7 +6,7 @@
 
   // api接口请求地址
   // window.SITE_CONFIG['baseUrl'] = 'https://api.ccharger.com.cn/ccharger/';
-  window.SITE_CONFIG['baseUrl'] = 'https://yuxay.cn:3310/';
+  window.SITE_CONFIG['baseUrl'] = 'https://yuxay.cn:3001/';
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain']  = './'; // 域名

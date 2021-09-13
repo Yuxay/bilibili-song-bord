@@ -97,10 +97,5 @@ module.exports = {
     child_process: "empty"
   },
   // 引入外部库, 无需webpack打包处理
-  externals: {
-    mockjs: "Mock",
-    echarts: "echarts",
-    ueditor: "UE",
-    TMap: "TMap"
-  }
+  externals: {}
 };
