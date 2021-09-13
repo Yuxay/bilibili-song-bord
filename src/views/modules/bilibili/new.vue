@@ -111,7 +111,7 @@
 import RoomConfig from "./room-config.vue";
 import pako from "pako";
 import axios from "axios";
-const instance = axios.create({
+const ahttp = axios.create({
   headers: {
     baseURL: "https://api.live.bilibili.com/",
     timeout: 1000 * 30,
@@ -182,12 +182,11 @@ export default {
     /** 通过B站接口获取直播间信息 */
     getRoomLiveInfo() {
       let _this = this;
-      instance({
-        url:
-          "https://api.live.bilibili.com/room/v1/Room/get_info?device=phone&;platform=ios&scale=3&build=10000&room_id=" +
-          _this.roomId,
-        method: "get"
-      })
+      ahttp
+        .get(
+          "/pc/room/v1/Room/get_info?device=phone&;platform=ios&scale=3&build=10000&room_id=" +
+            _this.roomId
+        )
         .then(({ data }) => {
           console.log("data: ", data);
           if (data && data.code == 0) {

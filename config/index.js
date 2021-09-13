@@ -14,7 +14,7 @@ module.exports = {
     // 代理列表, 是否开启代理通过[./dev.env.js]配置
     proxyTable: devEnv.OPEN_PROXY === false ? {} : {
       '/proxyApi': {
-        target: 'https://www.yuxay.cn:3001/',
+        target: 'https://www.yuxay.cn:3001',
         // target: 'https://yuxay.cn/web/',
         // target: 'http://localhost:3001/',
         // target: 'https://test.ccharger.com.cn/ccharger/',
