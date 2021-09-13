@@ -49,8 +49,7 @@
       >
         <span
           style="width: 5%; margin-right: 15px; opacity: 0.5; text-align: left;font-size:14px"
-          ></span
-        >
+        ></span>
         <span
           style="width: 28%; margin-right: 15px; opacity: 0.5; text-align: left"
           >用户</span
@@ -114,6 +113,7 @@ import pako from "pako";
 import axios from "axios";
 const instance = axios.create({
   headers: {
+    baseURL: "https://api.live.bilibili.com/",
     timeout: 1000 * 30,
     withCredentials: true,
     headers: {
@@ -121,13 +121,6 @@ const instance = axios.create({
       "Access-Control-Allow-Origin": "*"
       // 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
     }
-    // Accept:
-    //   "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-    // "Sec-Fetch-Dest": "document",
-    // "Sec-Fetch-Mode": "navigate",
-    // "Sec-Fetch-Site": "none",
-    // "Sec-Fetch-User": "?1",
-    // "Upgrade-Insecure-Requests": "1"
   }
 });
 export default {
@@ -189,9 +182,9 @@ export default {
     /** 通过B站接口获取直播间信息 */
     getRoomLiveInfo() {
       let _this = this;
-      this.$http({
+      instance({
         url:
-          "/pc/room/v1/Room/get_info?device=phone&;platform=ios&scale=3&build=10000&room_id=" +
+          "https://api.live.bilibili.com/room/v1/Room/get_info?device=phone&;platform=ios&scale=3&build=10000&room_id=" +
           _this.roomId,
         method: "get"
       })
