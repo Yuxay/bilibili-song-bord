@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-drawer
+      v-loading="isLoading"
       title="设置"
       :visible.sync="visible"
       direction="rtl"
@@ -54,13 +55,14 @@
 export default {
   data() {
     return {
+      isLoading: false,
       drawerSize: "30%",
       isMobile: false,
       visible: false,
       dataForm: {
         id: 0,
-        songCd: 3,
-        userCd: 24,
+        songCd: 24,
+        userCd: 3,
         roomId: 0,
         maxNum: 100
       }
@@ -92,6 +94,7 @@ export default {
     },
     init(roomId) {
       let _this = this;
+      this.isLoading = true;
       this.visible = true;
       this.dataForm.roomId = !this.isEmpty(roomId) && roomId != 0 ? roomId : 0;
       this.$http({
@@ -100,21 +103,27 @@ export default {
         params: this.$http.adornParams({
           roomId: _this.dataForm.roomId
         })
-      }).then(({ data }) => {
-        if (data && data.code == 0) {
-          console.log("data: ", data);
-          this.dataForm.id = data.data.id;
-          this.dataForm.roomId = data.data.roomId;
-          this.dataForm.userCd = data.data.userCd;
-          this.dataForm.songCd = data.data.songCd;
-          this.dataForm.maxNum = data.data.maxNum;
-        } else {
-          _this.$message({
-            type: "error",
-            message: data.msg
-          });
-        }
-      });
+      })
+        .then(({ data }) => {
+          if (data && data.code == 0) {
+            console.log("data: ", data);
+            this.dataForm.id = data.data.id;
+            this.dataForm.roomId = data.data.roomId;
+            this.dataForm.userCd = data.data.userCd;
+            this.dataForm.songCd = data.data.songCd;
+            this.dataForm.maxNum = data.data.maxNum;
+            _this.isLoading = false;
+          } else {
+            _this.isLoading = false;
+            _this.$message({
+              type: "error",
+              message: data.msg
+            });
+          }
+        })
+        .catch(() => {
+          _this.isLoading = false;
+        });
     },
     cancelHandle() {
       this.dataForm = {
@@ -128,6 +137,7 @@ export default {
     },
     dataFormSubmit() {
       let _this = this;
+      this.isLoading = true;
       let params = {};
       !this.isEmpty(_this.dataForm.id) && _this.dataForm.id != 0
         ? (params["id"] = _this.dataForm.id)
@@ -150,6 +160,7 @@ export default {
         .then(({ data }) => {
           if (data && data.code == 0) {
             if (_this.isMobile) {
+              _this.isLoading = false;
               _this.$notify({
                 type: "success",
                 message: "操作成功！",
@@ -159,6 +170,7 @@ export default {
                 }
               });
             } else {
+              _this.isLoading = false;
               _this.$message({
                 type: "success",
                 message: "操作成功！",
@@ -170,11 +182,13 @@ export default {
             }
           } else {
             if (_this.isMobile) {
+              _this.isLoading = false;
               _this.$notify({
                 type: "danger",
                 message: data.msg
               });
             } else {
+              _this.isLoading = false;
               _this.$message({
                 type: "error",
                 message: data.msg
@@ -182,7 +196,9 @@ export default {
             }
           }
         })
-        .catch(err => {});
+        .catch(err => {
+          _this.isLoading = false;
+        });
     }
   }
 };

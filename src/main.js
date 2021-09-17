@@ -22,9 +22,6 @@ import Vant from "vant";
 import "vant/lib/index.css";
 Vue.use(Vant);
 
-import vGanttChart from "v-gantt-chart";
-
-Vue.use(vGanttChart);
 
 // 挂载全局
 Vue.prototype.$http = httpRequest; // ajax请求方法

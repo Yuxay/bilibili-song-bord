@@ -14,6 +14,7 @@
           <div v-if="!isModify">
             直播间：<span>{{ roomId }}</span>
             <el-button size="mini" @click="isModify = true">修改</el-button>
+            <el-button size="mini" @click="getSongBoardList">查询</el-button>
           </div>
           <div v-else>
             <el-input
@@ -154,7 +155,7 @@ export default {
       this.getSongBoardList();
       this.openConnection();
     }
-    this.getRoomLiveInfo();
+    // this.getRoomLiveInfo();
     if (!window.navigator) {
       // FR.Msg.alert("提示", "当前设备：移动端APP");
       this.isMobile = true;
@@ -206,7 +207,7 @@ export default {
         localStorage.setItem("roomId", e);
         _this.socketTask.close();
         _this.openConnection();
-        _this.getRoomLiveInfo();
+        // _this.getRoomLiveInfo();
         _this.getSongBoardList();
       } else {
         this.roomId = 0;
@@ -365,10 +366,10 @@ export default {
       let startTime = this.liveTime;
       this.$http({
         url: this.$http.adornUrl("/room/song/select"),
-        method: "post",
-        data: this.$http.adornData({
+        method: "get",
+        params: this.$http.adornParams({
           roomId: _this.roomId,
-          chooseTime: startTime,
+          // chooseTime: startTime,
           deleted: 1
         })
       })
